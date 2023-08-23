@@ -7,6 +7,7 @@ import java.util.Observable;
 /** The state of a game of 2048.
  *  @author TODO: YOUR NAME HERE
  */
+@SuppressWarnings("deprecation")
 public class Model extends Observable {
     /** Current contents of the board. */
     private Board board;
@@ -106,14 +107,71 @@ public class Model extends Observable {
      *    value, then the leading two tiles in the direction of motion merge,
      *    and the trailing tile does not.
      * */
+    //这个函数负责找到某个位置向上移动的最后位置
+    //max是为了保证已经merge过的tile不再merge
+    private int find_next_north(int col,int line,int max)
+    {
+        Board board = this.board;
+        if(board.tile(col, line) == null) return -1;
+        int val = board.tile(col, line).value();
+        for(int i = line+1; i<max; i++)
+        {
+            if(board.tile(col,i)!=null && board.tile(col,i).value() == val)
+            {
+                return i;
+            }
+            else if (board.tile(col,i)!=null)
+            {
+                return i-1;
+            }
+        }
+        return max-1;
+    }
+    //单独一列向北移动的情况
+    private boolean help_col_north(int col)
+    {
+        Board board = this.board;
+        int max = board.size();
+        boolean flag = false;
+        for(int j= board.size()-2; j>=0; --j)
+        {
+            int des = find_next_north(col,j,max);
+            if(des == j || des<0) continue;
+            flag = true;
+            Tile t = board.tile(col,j);
+            if(board.move(col,des,t))
+            {
+                max = des;
+                this.score += 2*t.value();
+            }
+        }
+        return flag;
+    }
     public boolean tilt(Side side) {
         boolean changed;
         changed = false;
-
+        Board board = this.board;
         // TODO: Modify this.board (and perhaps this.score) to account
         // for the tilt to the Side SIDE. If the board changed, set the
         // changed local variable to true.
-
+        // 向上移动的情况
+        if(side == Side.NORTH)
+        {
+            for(int i=0; i<board.size();++i)
+            {
+                if(help_col_north(i)) changed =true;
+            }
+        }
+        //其他的情况
+        else
+        {
+            board.setViewingPerspective(side);
+            for(int i=0; i<board.size();++i)
+            {
+                if(help_col_north(i)) changed =true;
+            }
+            board.setViewingPerspective(Side.NORTH);
+        }
         checkGameOver();
         if (changed) {
             setChanged();
@@ -138,6 +196,13 @@ public class Model extends Observable {
      * */
     public static boolean emptySpaceExists(Board b) {
         // TODO: Fill in this function.
+        for(int i = 0; i<b.size();i++)
+        {
+            for(int j = 0; j<b.size();j++)
+            {
+                if(b.tile(i,j) == null) return true;
+            }
+        }
         return false;
     }
 
@@ -148,6 +213,14 @@ public class Model extends Observable {
      */
     public static boolean maxTileExists(Board b) {
         // TODO: Fill in this function.
+        for(int i = 0; i < b.size(); i++)
+        {
+            for(int j = 0; j < b.size(); j++)
+            {
+                if(b.tile(i,j) == null) continue;
+                if(b.tile(i,j).value() == MAX_PIECE) return true;
+            }
+        }
         return false;
     }
 
@@ -158,7 +231,29 @@ public class Model extends Observable {
      * 2. There are two adjacent tiles with the same value.
      */
     public static boolean atLeastOneMoveExists(Board b) {
-        // TODO: Fill in this function.
+        // TODO: Fill in this function
+        for(int i = 0; i < b.size(); i++)
+        {
+            for(int j = 0; j < b.size(); j++)
+            {
+                //检测第一种情况
+                if(b.tile(i,j) == null) return true;
+                //检测第二种情况
+                int val = b.tile(i,j).value();
+                if(i>0)
+                {
+                    int x1 = i-1; int y1 = j;
+                    int val1 = b.tile(x1,y1).value();
+                    if(val == val1) return true;
+                }
+                if(j>0)
+                {
+                    int x2 = i; int y2 = j-1;
+                    int val2 = b.tile(x2,y2).value();
+                    if(val == val2) return true;
+                }
+            }
+        }
         return false;
     }
 

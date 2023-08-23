@@ -14,6 +14,7 @@ import java.awt.event.KeyEvent;
 /** The GUI controller for a 2048 board and buttons.
  *  @author P. N. Hilfinger
  */
+@SuppressWarnings("deprecation")
 class GUI extends TopLevel implements Observer {
 
     /** Minimum size of board in pixels. */
