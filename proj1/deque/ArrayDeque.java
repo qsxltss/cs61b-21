@@ -43,7 +43,7 @@ public class ArrayDeque <T>
     }
     public void addFirst(T item)
     {
-        size ++;
+        size++;
         if(size >= max_len)
         {
             size--;
@@ -56,10 +56,12 @@ public class ArrayDeque <T>
     }
     public void addLast(T item)
     {
-        size +=1;
+        size++;
         if(size >= max_len)
         {
+            size--;
             resize((int)(max_len*mul));
+            size++;
         }
         items[end] = item;
         int x = end+1;
