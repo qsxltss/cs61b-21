@@ -146,7 +146,7 @@ public class ArrayDeque <T>
     public T get(int index)
     {
         if(index >= size || index < 0) return null;
-        return items[(first+index)%max_len];
+        return items[(first+index+1)%max_len];
     }
 
     public boolean equals(Object o)
