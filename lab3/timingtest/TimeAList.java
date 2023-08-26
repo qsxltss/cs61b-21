@@ -14,7 +14,7 @@ public class TimeAList {
             int opCount = opCounts.get(i);
             double timePerOp = time / opCount * 1e6;
             //double timePerOp = time / opCount;
-            System.out.printf("%12d %12.4f %12d %12.4f\n", N, time, opCount, timePerOp);
+            System.out.printf("%12d %12.2f %12d %12.2f\n", N, time, opCount, timePerOp);
         }
     }
 
@@ -30,7 +30,7 @@ public class TimeAList {
         AList<Integer> opCounts = new AList<>();
         int i = 0;
         int tick = 0;
-        while(i < 12800000)
+        while(i < 128000)
         {
             i++;
             if(i == Math.pow(2,tick) * 1000)
