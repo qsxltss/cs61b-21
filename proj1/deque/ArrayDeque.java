@@ -4,14 +4,14 @@ import java.util.Iterator;
 
 public class ArrayDeque<T> implements Deque<T>
 {
-    double prop = 0.25;
-    double mul = 4;
+    private double prop = 0.25;
+    private double mul = 4;
 
     private T[] items;
     private int size;
-    int max_len;
-    int first;
-    int end;
+    private int max_len;
+    private int first;
+    private int end;
 
     public ArrayDeque()
     {
@@ -151,15 +151,21 @@ public class ArrayDeque<T> implements Deque<T>
     {
         if(!(o instanceof Deque)) return false;
         if(((Deque<?>) o).size() != size) return false;
-        int i = first;
-        int j = ((ArrayDeque<?>) o).first;
-        int num = 0;
-        while(num<size)
+        if(LinkedListDeque.class.isInstance(o))
         {
-            i = (i+1)%max_len;
-            j = (j+1)%max_len;
-            if(((ArrayDeque<Object>) o).get(i).equals(this.get(j))) continue;
-            else return false;
+            for(int i = 0; i<size; ++i)
+            {
+                if(((LinkedListDeque<?>) o).get(i).equals(get(i))) continue;
+                else return false;
+            }
+        }
+        else if(ArrayDeque.class.isInstance(o))
+        {
+            for(int i = 0; i<size; ++i)
+            {
+                if(((ArrayDeque<?>) o).get(i).equals(get(i))) continue;
+                else return false;
+            }
         }
         return true;
     }

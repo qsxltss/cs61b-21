@@ -123,10 +123,21 @@ public class LinkedListDeque <T> implements Deque<T>
     {
         if(!(o instanceof Deque)) return false;
         if(((Deque<?>) o).size() != size) return false;
-        for(int i = 0; i<size; ++i)
+        if(LinkedListDeque.class.isInstance(o))
         {
-            if(((LinkedListDeque<?>) o).get(i).equals(this.get(i))) continue;
-            else return false;
+            for(int i = 0; i<size; ++i)
+            {
+                if(((LinkedListDeque<?>) o).get(i).equals(get(i))) continue;
+                else return false;
+            }
+        }
+        else if(ArrayDeque.class.isInstance(o))
+        {
+            for(int i = 0; i<size; ++i)
+            {
+                if(((ArrayDeque<?>) o).get(i).equals(get(i))) continue;
+                else return false;
+            }
         }
         return true;
     }

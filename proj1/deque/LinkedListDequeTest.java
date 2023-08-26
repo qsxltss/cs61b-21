@@ -88,7 +88,6 @@ public class LinkedListDequeTest {
         LinkedListDeque<String>  lld1 = new LinkedListDeque<String>();
         LinkedListDeque<Double>  lld2 = new LinkedListDeque<Double>();
         LinkedListDeque<Boolean> lld3 = new LinkedListDeque<Boolean>();
-
         lld1.addFirst("string");
         lld2.addFirst(3.14159);
         lld3.addFirst(true);
@@ -133,5 +132,18 @@ public class LinkedListDequeTest {
         for (double i = 999999; i > 500000; i--) {
             assertEquals("Should have the same value", i, (double) lld1.removeLast(), 0.0);
         }
+    }
+
+    @Test
+    public void EqualTest()
+    {
+        LinkedListDeque<Integer> lld1 = new LinkedListDeque<>();
+        ArrayDeque<Integer> lld2 = new ArrayDeque<>();
+        for(int i=0 ; i<10;++i)
+        {
+            lld1.addFirst(i);
+            lld2.addFirst(i);
+        }
+        assertTrue("",lld2.equals(lld1));
     }
 }
