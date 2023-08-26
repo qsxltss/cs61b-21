@@ -1,15 +1,14 @@
 package deque;
 
-import java.util.Deque;
 import java.util.Iterator;
 
-public class ArrayDeque <T>
+public class ArrayDeque<T> implements Deque<T>
 {
     double prop = 0.25;
     double mul = 4;
 
     private T[] items;
-    int size;
+    private int size;
     int max_len;
     int first;
     int end;
@@ -41,6 +40,7 @@ public class ArrayDeque <T>
         end = size;
         max_len = len;
     }
+
     public void addFirst(T item)
     {
         size++;
@@ -68,11 +68,7 @@ public class ArrayDeque <T>
         int num = x%max_len;
         end = num;
     }
-    public boolean isEmpty()
-    {
-        if(size == 0) return true;
-        else return false;
-    }
+
     public int size()
     {
         return size;
@@ -168,8 +164,25 @@ public class ArrayDeque <T>
         return true;
     }
 
-    public Iterator<T> iterator()
-    {
-        return null;
+    public Iterator<T> iterator() {
+        return new ArrayDequeIterator();
+    }
+
+    private class ArrayDequeIterator implements Iterator<T> {
+        private int wizPos;
+
+        private ArrayDequeIterator() {
+            wizPos = 0;
+        }
+
+        public boolean hasNext() {
+            return wizPos < size;
+        }
+
+        public T next() {
+            T item = get(wizPos);
+            wizPos += 1;
+            return item;
+        }
     }
 }
