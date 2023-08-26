@@ -18,10 +18,10 @@ public class MaxArrayDeque <T> extends ArrayDeque<T> {
     public T max(Comparator<T> c)
     {
         if(size() == 0) return null;
-        T max1 = get(0);
+        T max1 = (T)(get(0));
         for(int i = 1; i<size(); ++i)
         {
-            T now = get(i);
+            T now = (T)(get(i));
             if(c.compare(now,max1)>=0)
             {
                 max1 = now;
