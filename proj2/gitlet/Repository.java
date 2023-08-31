@@ -144,15 +144,10 @@ public class Repository implements Serializable {
     }
     public void commitTask(String message)
     {
-        if(message == "")
-        {
-            System.out.println("Please enter a commit message.");
-            System.exit(0);
-        }
         //调用第三种构造方式：以HEAD中的commit为基础
         Commit new_commit = new Commit(Methods_myself.head_commit(),message);
         //遍历stage_add目录，把其中的Blobs加入
-        if(DIR_stage_addition.listFiles().length == 0)
+        if((DIR_stage_addition.listFiles().length + DIR_stage_removal.listFiles().length)== 0)
         {
             System.out.println("No changes added to the commit.");
             System.exit(0);
@@ -265,7 +260,7 @@ public class Repository implements Serializable {
             System.out.println("Found no commit with that message");
         }
     }
-    public void staticTask()
+    public void statusTask()
     {
         //先输出Branches
         System.out.println("=== Branches ===");
@@ -369,6 +364,8 @@ public class Repository implements Serializable {
         if(n.equals(name))
         {
             System.out.println("o need to checkout the current branch.");
+            System.exit(0);
         }
+        Commit now = readObject(f,Commit.class);
     }
 }
