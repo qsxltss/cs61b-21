@@ -144,6 +144,11 @@ public class Repository implements Serializable {
     }
     public void commitTask(String message)
     {
+        if(message.equals(""))
+        {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
         //调用第三种构造方式：以HEAD中的commit为基础
         Commit new_commit = new Commit(Methods_myself.head_commit(),message);
         //遍历stage_add目录，把其中的Blobs加入
@@ -332,6 +337,7 @@ public class Repository implements Serializable {
         if(head == null)
         {
             System.out.println("No commit with that id exists.");
+            System.exit(0);
         }
         //后续与checkout1相同
         Blob b = head.find_Blob_name(name);
