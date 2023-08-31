@@ -144,6 +144,11 @@ public class Repository implements Serializable {
     }
     public void commitTask(String message)
     {
+        if(message == "")
+        {
+            System.out.println("Please enter a commit message.");
+            System.exit(0);
+        }
         //调用第三种构造方式：以HEAD中的commit为基础
         Commit new_commit = new Commit(Methods_myself.head_commit(),message);
         //遍历stage_add目录，把其中的Blobs加入
@@ -289,7 +294,7 @@ public class Repository implements Serializable {
         }
         System.out.println();
         //再输出Removed Files
-        System.out.println("=== Staged Files ===");
+        System.out.println("=== Removed Files ===");
         List<String> l2 = Methods_myself.list_sort(DIR_stage_removal);
         for(int i=0; i<l2.size();++i)
         {
@@ -349,21 +354,21 @@ public class Repository implements Serializable {
         }
         writeContents(f,b.getContent());
     }
-    public void checkout3Task()
+    public void checkout3Task(String name)
     {
-        String id = readContentsAsString(Utils.join(GITLET_DIR,"HEAD"));
-        System.out.println(id);
-        File f = Utils.join(DIR_Commits,id);
-        Commit c = readObject(f, Commit.class);
-        String bid = c.getBlobid(0);
-        System.out.println(bid);
-        Blob b = readObject(Utils.join(DIR_Blobs,bid), Blob.class);
-        System.out.println(b.getName());
-        System.out.println(b.getContent());
-        /*for(File f:DIR_Blobs.listFiles())
+        //找到这个name对应的branch的commit
+        File f = Utils.join(DIR_Branches,name);
+        if(!f.exists())
         {
-            Blob b = readObject(f, Blob.class);
-            System.out.println(b.getContent());
-        }*/
+            System.out.println("No such branch exists.");
+            System.exit(0);
+        }
+        //和cur_branch比较一下是否相同
+        File cur = Utils.join(GITLET_DIR,"cur_branch");
+        String n = readContentsAsString(cur);
+        if(n.equals(name))
+        {
+            System.out.println("o need to checkout the current branch.");
+        }
     }
 }

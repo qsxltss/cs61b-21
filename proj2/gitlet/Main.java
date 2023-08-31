@@ -30,11 +30,7 @@ public class Main {
                 break;
             // TODO: FILL THE REST IN
             case "commit":
-                if(args.length != 2)
-                {
-                    System.out.println("Please enter a commit message.");
-                    System.exit(0);
-                }
+                validateNumArgs(args,2);
                 resp.commitTask(args[1]);
                 break;
             case "rm":
