@@ -183,20 +183,20 @@ public class Repository implements Serializable {
     }
     public void rmTask(String name)
     {
-        //找到对应文件的Blob_id
         File f = Utils.join(CWD,name);
-        if(!f.exists())
-        {
-            //不存在这个文件就退出
-            System.exit(0);
-        }
-        String cont = readContentsAsString(f);
-        String Blob_id = sha1(name,cont);
         //in_stage判断是否在stage_add中
         boolean in_stage = Methods_myself.check_exist_name(DIR_stage_addition,name);
-        Commit c = Methods_myself.head_commit();
         //in_commit判断是否在cur_commit的关注中
-        boolean in_commit = c.check_Blob(Blob_id);
+        //同时记录一下这个文件的id
+        Commit c = Methods_myself.head_commit();
+        boolean in_commit = false;
+        int i = c.find_Blob_name_return_i(name);
+        String Blob_id = null;
+        if(i >= 0)
+        {
+            Blob_id = c.getBlobid(i);
+            in_commit = true;
+        }
         //如果都不在的话，就退出
         if(!in_stage && !in_commit)
         {
@@ -214,7 +214,7 @@ public class Repository implements Serializable {
         {
             File f2 = Methods_myself.make_file(DIR_stage_removal,name);
             writeContents(f2,Blob_id);
-            f.delete();
+            if(f.exists()) f.delete();
         }
     }
     public void logTask()
