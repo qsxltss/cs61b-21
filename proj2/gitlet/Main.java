@@ -64,7 +64,7 @@ public class Main {
                 }
                 else if(args.length == 2)
                 {
-                    resp.checkout3Task();
+                    //resp.checkout3Task();
                 }
                 break;
             default:
