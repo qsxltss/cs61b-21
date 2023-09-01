@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ResourceBundle;
 
 import static gitlet.Utils.readObject;
+import static gitlet.Utils.writeContents;
 
 public class Methods_myself {
     public static void mkdir(File f)
@@ -32,7 +33,7 @@ public class Methods_myself {
         return f;
     }
     //检查某个文件是否存在
-    public static boolean check_exist_name(File dir, String name)
+    public static boolean check_file_exist(File dir, String name)
     {
         File f = Utils.join(dir,name);
         if(!f.exists()) return false;
@@ -104,5 +105,17 @@ public class Methods_myself {
         });
         return l;
     }
-
+    //将cont的内容写到dir+name的位置处
+    public static void write_cont(File dir,String name,String cont)
+    {
+        File f = Utils.join(dir,name);
+        if(f.exists()) f.delete();
+        //新创建这个文件，并把commit中的Blob的内容写进去
+        try {
+            f.createNewFile();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        writeContents(f,cont);
+    }
 }

@@ -64,9 +64,16 @@ public class Main {
                 }
                 else if(args.length == 2)
                 {
-                    //resp.checkout3Task();
+                    resp.checkout3Task(args[1]);
                 }
                 break;
+            case "branch":
+                validateNumArgs(args,2);
+                resp.branchTask(args[1]);
+                break;
+            case "rm-branch":
+                validateNumArgs(args,2);
+                resp.rmbranchTask(args[1]);
             default:
                 System.out.println("No command with that name exists");
                 System.exit(0);
@@ -80,6 +87,7 @@ public class Main {
     }
     public static void validateNumArgs( String[] args, int n) {
         if (args.length != n) {
+            System.out.println("Incorrect operands.");
             System.exit(0);
         }
     }

@@ -118,7 +118,7 @@ public class Repository implements Serializable {
         if(head1.check_contents_equal(name,cont))
         {
             //如果已经在stage_add中，就去除它
-            if(Methods_myself.check_exist_name(DIR_stage_addition,name))
+            if(Methods_myself.check_file_exist(DIR_stage_addition,name))
             {
                File f1 = Utils.join(DIR_stage_addition,name);
                f1.delete();
@@ -136,7 +136,7 @@ public class Repository implements Serializable {
             File f2 = Methods_myself.make_file(DIR_stage_addition,name);
             writeContents(f2,id);
         }
-        if(Methods_myself.check_exist_name(DIR_stage_removal,name))
+        if(Methods_myself.check_file_exist(DIR_stage_removal,name))
         {
             File f1 = Utils.join(DIR_stage_removal,name);
             f1.delete();
@@ -190,7 +190,7 @@ public class Repository implements Serializable {
     {
         File f = Utils.join(CWD,name);
         //in_stage判断是否在stage_add中
-        boolean in_stage = Methods_myself.check_exist_name(DIR_stage_addition,name);
+        boolean in_stage = Methods_myself.check_file_exist(DIR_stage_addition,name);
         //in_commit判断是否在cur_commit的关注中
         //同时记录一下这个文件的id
         Commit c = Methods_myself.head_commit();
@@ -319,16 +319,7 @@ public class Repository implements Serializable {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
         }
-        //看现在有没有这个文件，有的话就给删除掉
-        File f = Utils.join(CWD,name);
-        if(f.exists()) f.delete();
-        //新创建这个文件，并把commit中的Blob的内容写进去
-        try {
-            f.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        writeContents(f,b.getContent());
+        Methods_myself.write_cont(CWD,name,b.getContent());
     }
     public void checkout2Task(String id,String name)
     {
@@ -346,14 +337,7 @@ public class Repository implements Serializable {
             System.out.println("File does not exist in that commit.");
             System.exit(0);
         }
-        File f = Utils.join(CWD,name);
-        if(f.exists()) f.delete();
-        try {
-            f.createNewFile();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        writeContents(f,b.getContent());
+        Methods_myself.write_cont(CWD,name,b.getContent());
     }
     public void checkout3Task(String name)
     {
@@ -364,14 +348,90 @@ public class Repository implements Serializable {
             System.out.println("No such branch exists.");
             System.exit(0);
         }
+        Commit now = readObject(f,Commit.class);
         //和cur_branch比较一下是否相同
         File cur = Utils.join(GITLET_DIR,"cur_branch");
         String n = readContentsAsString(cur);
         if(n.equals(name))
         {
-            System.out.println("o need to checkout the current branch.");
+            System.out.println("No need to checkout the current branch.");
             System.exit(0);
         }
-        Commit now = readObject(f,Commit.class);
+        //动态数组记录now跟踪的文件名,方便之后和旧head的比较
+        List<String> l_new = new ArrayList<>();
+        //动态数组记录旧head跟踪的文件名
+        List<String> l_old = new ArrayList<>();
+        //记录旧head跟踪的文件名
+        Commit head = Methods_myself.head_commit();
+        for(int i=0; i<head.len_Blog(); i++)
+        {
+            Blob b = now.find_Blob(i);
+            l_old.add(b.getName());
+        }
+        //将now跟踪的Blob内容更新到working directory
+        for(int i=0; i<now.len_Blog(); i++)
+        {
+            Blob b = now.find_Blob(i);
+            l_new.add(b.getName());
+            File f1 = Utils.join(CWD,b.getName());
+            //如果f1存在并且old_head中没有记录它，那就报错退出
+            if(f1.exists() && !l_old.contains(b.getName()))
+            {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
+            Methods_myself.write_cont(CWD,b.getName(),b.getContent());
+        }
+        //将stage清空
+        for(File f2: DIR_stage_removal.listFiles())
+        {
+            f2.delete();
+        }
+        for(File f2: DIR_stage_addition.listFiles())
+        {
+            f2.delete();
+        }
+        //与旧head跟踪的内容进行比较，如果旧head有而now没有，则把它删去
+        for(int i=0; i<l_old.size(); ++i)
+        {
+            String name1 = l_old.get(i);
+            File f2 = Utils.join(CWD,name1);
+            if(!l_new.contains(name1) && f2.exists()) f2.delete();
+        }
+        //更新cur_branch与HEAD
+        Methods_myself.write_cont(CWD,"cur_branch",name);
+        Methods_myself.write_cont(CWD,"HEAD",now.getUID());
+    }
+    public void branchTask(String branch_name)
+    {
+        //已存在则报错
+        if(Methods_myself.check_file_exist(DIR_Branches,branch_name))
+        {
+            System.out.println("A branch with that name already exists.");
+            System.exit(0);
+        }
+        //没有存在就创建并把head的内容写进去
+        File f = Methods_myself.make_file(DIR_Branches,branch_name);
+        String id = readContentsAsString(Utils.join(GITLET_DIR,"HEAD"));
+        writeContents(f,id);
+    }
+    public void rmbranchTask(String branch_name)
+    {
+        //没有存在则报错
+        if(!Methods_myself.check_file_exist(DIR_Branches,branch_name))
+        {
+            System.out.println("A branch with that name does not exist.");
+            System.exit(0);
+        }
+        //如果是删除cur_branch则报错
+        String cur_branch = Methods_myself.read(GITLET_DIR,"cur_branch");
+        if(cur_branch == branch_name)
+        {
+            System.out.println("Cannot remove the current branch.");
+            System.exit(0);
+        }
+        //把这个文件删除
+        File f = Methods_myself.find_name(DIR_Branches,branch_name);
+        f.delete();
     }
 }

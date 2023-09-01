@@ -78,7 +78,11 @@ public class Commit implements Serializable {
     {
         return this.UID;
     }
-
+    //返回Blobid长度
+    public int len_Blog()
+    {
+        return this.BlobIDs.size();
+    }
     public String getBlobid(int i)
     {
         return this.BlobIDs.get(i);
@@ -159,6 +163,14 @@ public class Commit implements Serializable {
             }
         }
         return -1;
+    }
+    //找到Blobid中的第i项
+    public Blob find_Blob(int i)
+    {
+        String id = BlobIDs.get(i);
+        File f = Methods_myself.find_id(Repository.DIR_Blobs,id);
+        Blob b = Utils.readObject(f, Blob.class);
+        return b;
     }
     /* TODO: fill in the rest of this class. */
 }
