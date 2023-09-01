@@ -397,7 +397,11 @@ public class Repository implements Serializable {
         {
             String name1 = l_old.get(i);
             File f2 = Utils.join(CWD,name1);
-            if(!l_new.contains(name1) && f2.exists()) f2.delete();
+            if(!l_new.contains(name1) && f2.exists())
+            {
+                //System.out.println(name1);
+                f2.delete();
+            }
         }
         //更新cur_branch与HEAD
         Methods_myself.write_cont(GITLET_DIR,"cur_branch",name);
@@ -426,7 +430,7 @@ public class Repository implements Serializable {
         }
         //如果是删除cur_branch则报错
         String cur_branch = Methods_myself.read(GITLET_DIR,"cur_branch");
-        if(cur_branch == branch_name)
+        if(cur_branch.equals(branch_name))
         {
             System.out.println("Cannot remove the current branch.");
             System.exit(0);
