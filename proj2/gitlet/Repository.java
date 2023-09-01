@@ -267,6 +267,11 @@ public class Repository implements Serializable {
     }
     public void statusTask()
     {
+        if(!Methods_myself.check_file_exist(CWD, ".gitlet"))
+        {
+            System.out.println("Not in an initialized Gitlet directory.");
+            System.exit(0);
+        }
         //先输出Branches
         System.out.println("=== Branches ===");
         //找到当前的branch，因为前面要加星号
@@ -492,7 +497,15 @@ public class Repository implements Serializable {
                 f2.delete();
             }
         }
-        //更新cur_branch与HEAD
+        //更新HEAD
         Methods_myself.write_cont(GITLET_DIR,"HEAD",now.getUID());
+        //更新当前branch的head
+        String cur_branch = readContentsAsString(Utils.join(CWD,"cur_branch"));
+        File f = Utils.join(DIR_Branches,cur_branch);
+        writeContents(f,now.getUID());
+    }
+    public void mergeTask(String branch_name)
+    {
+
     }
 }
