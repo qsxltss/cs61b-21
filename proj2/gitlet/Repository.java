@@ -366,7 +366,7 @@ public class Repository implements Serializable {
         Commit head = Methods_myself.head_commit();
         for(int i=0; i<head.len_Blog(); i++)
         {
-            Blob b = now.find_Blob(i);
+            Blob b = head.find_Blob(i);
             l_old.add(b.getName());
         }
         //将now跟踪的Blob内容更新到working directory
