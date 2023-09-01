@@ -56,10 +56,20 @@ public class Main {
             case "checkout":
                 if(args.length == 3)
                 {
+                    if(!args[1].equals("--"))
+                    {
+                        System.out.println("Incorrect operands.");
+                        System.exit(0);
+                    }
                     resp.checkout1Task(args[2]);
                 }
                 else if(args.length == 4)
                 {
+                    if(!args[2].equals("--"))
+                    {
+                        System.out.println("Incorrect operands.");
+                        System.exit(0);
+                    }
                     resp.checkout2Task(args[1],args[3]);
                 }
                 else if(args.length == 2)
