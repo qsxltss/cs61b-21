@@ -400,8 +400,8 @@ public class Repository implements Serializable {
             if(!l_new.contains(name1) && f2.exists()) f2.delete();
         }
         //更新cur_branch与HEAD
-        Methods_myself.write_cont(CWD,"cur_branch",name);
-        Methods_myself.write_cont(CWD,"HEAD",now.getUID());
+        Methods_myself.write_cont(GITLET_DIR,"cur_branch",name);
+        Methods_myself.write_cont(GITLET_DIR,"HEAD",now.getUID());
     }
     public void branchTask(String branch_name)
     {
