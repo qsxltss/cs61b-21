@@ -348,7 +348,8 @@ public class Repository implements Serializable {
             System.out.println("No such branch exists.");
             System.exit(0);
         }
-        Commit now = readObject(f,Commit.class);
+        String id = readContentsAsString(f);
+        Commit now = readObject(Utils.join(DIR_Commits,id),Commit.class);
         //和cur_branch比较一下是否相同
         File cur = Utils.join(GITLET_DIR,"cur_branch");
         String n = readContentsAsString(cur);
