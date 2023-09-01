@@ -500,7 +500,7 @@ public class Repository implements Serializable {
         //更新HEAD
         Methods_myself.write_cont(GITLET_DIR,"HEAD",now.getUID());
         //更新当前branch的head
-        String cur_branch = readContentsAsString(Utils.join(CWD,"cur_branch"));
+        String cur_branch = readContentsAsString(Utils.join(GITLET_DIR,"cur_branch"));
         File f = Utils.join(DIR_Branches,cur_branch);
         writeContents(f,now.getUID());
     }
