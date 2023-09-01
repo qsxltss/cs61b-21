@@ -84,6 +84,7 @@ public class Main {
             case "rm-branch":
                 validateNumArgs(args,2);
                 resp.rmbranchTask(args[1]);
+                break;
             default:
                 System.out.println("No command with that name exists");
                 System.exit(0);
