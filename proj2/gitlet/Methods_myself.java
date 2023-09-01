@@ -80,6 +80,7 @@ public class Methods_myself {
         for(File f:dir.listFiles())
         {
             String name = f.getName();
+            if(id.length() > name.length()) continue;
             if(id.equals(name.substring(0,id.length())))
             {
                 Commit head1 = readObject(f, Commit.class);

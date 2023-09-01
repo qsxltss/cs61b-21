@@ -85,6 +85,10 @@ public class Main {
                 validateNumArgs(args,2);
                 resp.rmbranchTask(args[1]);
                 break;
+            case "reset":
+                validateNumArgs(args,2);
+                resp.resetTask(args[1]);
+                break;
             default:
                 System.out.println("No command with that name exists");
                 System.exit(0);

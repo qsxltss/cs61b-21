@@ -439,4 +439,60 @@ public class Repository implements Serializable {
         File f = Methods_myself.find_name(DIR_Branches,branch_name);
         f.delete();
     }
+    public void resetTask(String id)
+    {
+        Commit now = Methods_myself.find_commit_part(id);
+        if(now == null)
+        {
+            System.out.println("No commit with that id exists.");
+            System.exit(0);
+        }
+        //动态数组记录now跟踪的文件名,方便之后和旧head的比较
+        List<String> l_new = new ArrayList<>();
+        //动态数组记录旧head跟踪的文件名
+        List<String> l_old = new ArrayList<>();
+        //记录旧head跟踪的文件名
+        Commit head = Methods_myself.head_commit();
+        for(int i=0; i<head.len_Blog(); i++)
+        {
+            Blob b = head.find_Blob(i);
+            l_old.add(b.getName());
+        }
+        //将now跟踪的Blob内容更新到working directory
+        for(int i=0; i<now.len_Blog(); i++)
+        {
+            Blob b = now.find_Blob(i);
+            l_new.add(b.getName());
+            File f1 = Utils.join(CWD,b.getName());
+            //如果f1存在并且old_head中没有记录它，那就报错退出
+            if(f1.exists() && !l_old.contains(b.getName()))
+            {
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
+            }
+            Methods_myself.write_cont(CWD,b.getName(),b.getContent());
+        }
+        //将stage清空
+        for(File f2: DIR_stage_removal.listFiles())
+        {
+            f2.delete();
+        }
+        for(File f2: DIR_stage_addition.listFiles())
+        {
+            f2.delete();
+        }
+        //与旧head跟踪的内容进行比较，如果旧head有而now没有，则把它删去
+        for(int i=0; i<l_old.size(); ++i)
+        {
+            String name1 = l_old.get(i);
+            File f2 = Utils.join(CWD,name1);
+            if(!l_new.contains(name1) && f2.exists())
+            {
+                //System.out.println(name1);
+                f2.delete();
+            }
+        }
+        //更新cur_branch与HEAD
+        Methods_myself.write_cont(GITLET_DIR,"HEAD",now.getUID());
+    }
 }
