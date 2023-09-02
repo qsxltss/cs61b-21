@@ -520,23 +520,23 @@ public class Repository implements Serializable {
         //如果不存在这个branch，报错退出
         if(branch == null)
         {
-            System.out.println("You have uncommitted changes.");
+            System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
         //如果branch就是head，报错退出
-        if(branch == head_commit)
+        if(branch.getTimestamp().equals(head_commit.getTimestamp()) && branch.getMessage().equals(head_commit.getMessage()))
         {
-            System.out.println("You have uncommitted changes.");
+            System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
         }
         //找到split node(共同的祖先)
         Commit ancestor = Methods_myself.find_common_ancestor(branch,head_commit);
-        if(ancestor == branch)
+        if(ancestor.getTimestamp().equals(branch.getTimestamp()) && ancestor.getMessage().equals(branch.getMessage()))
         {
             System.out.println("Given branch is an ancestor of the current branch.");
             return;
         }
-        else if(ancestor == head_commit)
+        else if(ancestor.getMessage().equals(head_commit.getMessage()) && ancestor.getTimestamp().equals(head_commit.getTimestamp()))
         {
             System.out.println("Current branch fast-forwarded.");
             checkout3Task(branch_name);
