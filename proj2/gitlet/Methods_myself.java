@@ -158,4 +158,13 @@ public class Methods_myself {
         String str = "<<<<<<< HEAD\n"+head+"=======\n"+branch+">>>>>>>\n";
         write_cont(Repository.CWD,name,str);
     }
+    //
+    public static boolean check_commit_equal(Commit a,Commit b)
+    {
+        if(a.getTimestamp().equals(b.getTimestamp()) && a.getMessage().equals(b.getMessage()))
+        {
+            return true;
+        }
+        return false;
+    }
 }

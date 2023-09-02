@@ -29,6 +29,7 @@ public class Commit implements Serializable {
     private String message;
     private String timestamp;
     private String parent;
+    private String parent2;
     private String UID;
     private List<String> BlobIDs;
     private SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM dd HH:mm:ss yyyy Z",Locale.ENGLISH);
@@ -41,6 +42,7 @@ public class Commit implements Serializable {
         Date d = new Date(0);
         this.timestamp = sdf.format(d);
         this.parent = null;
+        this.parent2 = null;
         this.BlobIDs = new ArrayList<>();
         this.UID = Utils.sha1(this.message,this.timestamp);
     }
@@ -50,6 +52,22 @@ public class Commit implements Serializable {
         sdf.setTimeZone(TimeZone.getTimeZone("GMT-8:00"));
         this.message = new_message;
         this.parent = c.getUID();
+        this.parent2 = null;
+        Date d = new Date();
+        this.timestamp = sdf.format(d);
+        this.BlobIDs = new ArrayList<>();
+        for(int i=0; i<c.BlobIDs.size();++i)
+        {
+            BlobIDs.add(c.BlobIDs.get(i));
+        }
+        this.UID = Utils.sha1(this.message,this.timestamp);
+    }
+    public Commit (Commit c,String new_message,String parent2)
+    {
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT-8:00"));
+        this.message = new_message;
+        this.parent = c.getUID();
+        this.parent2 = parent2;
         Date d = new Date();
         this.timestamp = sdf.format(d);
         this.BlobIDs = new ArrayList<>();
@@ -73,7 +91,10 @@ public class Commit implements Serializable {
     {
         return this.parent;
     }
-
+    public String getParent2()
+    {
+        return this.parent2;
+    }
     public String getUID()
     {
         return this.UID;

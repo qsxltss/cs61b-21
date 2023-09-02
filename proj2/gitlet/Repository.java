@@ -151,8 +151,47 @@ public class Repository implements Serializable {
             System.out.println("Please enter a commit message.");
             System.exit(0);
         }
-        //调用第三种构造方式：以HEAD中的commit为基础
+        //调用第二种构造方式：以HEAD中的commit为基础
         Commit new_commit = new Commit(Methods_myself.head_commit(),message);
+        //遍历stage_add目录，把其中的Blobs加入
+        if((DIR_stage_addition.listFiles().length + DIR_stage_removal.listFiles().length)== 0)
+        {
+            System.out.println("No changes added to the commit.");
+            System.exit(0);
+        }
+        for(File f: DIR_stage_addition.listFiles())
+        {
+            String name = f.getName();
+            int m = new_commit.find_Blob_name_return_i(name);
+            if(m >=0)
+            {
+                new_commit.removeBlobid(m);
+            }
+            String id = readContentsAsString(f);
+            new_commit.add_Blob(id);
+            f.delete();
+        }
+        //遍历stage_remove目录，把其中的Blobs删去
+        for(File f: DIR_stage_removal.listFiles())
+        {
+            String id = readContentsAsString(f);
+            new_commit.remove_Blob(id);
+            f.delete();
+        }
+        //将commit储存在Dir_commit中
+        File save = Utils.join(DIR_Commits,new_commit.getUID());
+        Utils.writeObject(save,new_commit);
+        //将Head和cur_branch更新
+        String cur_branch_name = readContentsAsString(Utils.join(GITLET_DIR,"cur_branch"));
+        File cur_branch = Methods_myself.find_name(DIR_Branches,cur_branch_name);
+        File Head = Methods_myself.find_name(GITLET_DIR,"HEAD");
+        Utils.writeContents(cur_branch,new_commit.getUID());
+        Utils.writeContents(Head,new_commit.getUID());
+    }
+    //为了merge专门设立一个
+    public void commit_merge(String message,String parent2)
+    {
+        Commit new_commit = new Commit(Methods_myself.head_commit(),message,parent2);
         //遍历stage_add目录，把其中的Blobs加入
         if((DIR_stage_addition.listFiles().length + DIR_stage_removal.listFiles().length)== 0)
         {
@@ -229,13 +268,26 @@ public class Repository implements Serializable {
         Commit c = Methods_myself.head_commit();
         while(c!=null)
         {
-            System.out.println("===");
-            System.out.println("commit "+ c.getUID());
-            System.out.println("Date: "+ c.getTimestamp());
-            System.out.println(c.getMessage());
-            System.out.println();
-            if(c.getParent() == null) c =null;
-            else c = Methods_myself.find_commit(c.getParent());
+            if (c.getParent2()!=null)
+            {
+                System.out.println("===");
+                System.out.println("commit "+ c.getUID());
+                System.out.println("Merge: "+c.getParent().substring(0, 7)+" "+c.getParent2().substring(0,7));
+                System.out.println("Date: "+ c.getTimestamp());
+                System.out.println(c.getMessage());
+                System.out.println();
+            }
+            else
+            {
+                System.out.println("===");
+                System.out.println("commit "+ c.getUID());
+                System.out.println("Date: "+ c.getTimestamp());
+                System.out.println(c.getMessage());
+                System.out.println();
+            }
+            if(c.getParent() != null) c = Methods_myself.find_commit(c.getParent());
+            else if(c.getParent2()!=null) c = Methods_myself.find_commit(c.getParent2());
+            else c = null;
         }
     }
     public void globallogTask()
@@ -243,11 +295,23 @@ public class Repository implements Serializable {
        for (File f:DIR_Commits.listFiles())
        {
            Commit c = readObject(f,Commit.class);
-           System.out.println("===");
-           System.out.println("commit "+ c.getUID());
-           System.out.println("Date: "+ c.getTimestamp());
-           System.out.println(c.getMessage());
-           System.out.println();
+           if (c.getParent2()!=null)
+           {
+               System.out.println("===");
+               System.out.println("commit "+ c.getUID());
+               System.out.println("Merge: "+c.getParent().substring(0, 7)+" "+c.getParent2().substring(0,7));
+               System.out.println("Date: "+ c.getTimestamp());
+               System.out.println(c.getMessage());
+               System.out.println();
+           }
+           else
+           {
+               System.out.println("===");
+               System.out.println("commit " + c.getUID());
+               System.out.println("Date: " + c.getTimestamp());
+               System.out.println(c.getMessage());
+               System.out.println();
+           }
        }
     }
     public void findTask(String message)
@@ -515,112 +579,107 @@ public class Repository implements Serializable {
         }
         Commit head_commit = Methods_myself.head_commit();
         //找到branch_name对应的Commit
-        String id = readContentsAsString(Utils.join(DIR_Branches,branch_name));
-        Commit branch = Methods_myself.find_commit(id);
+        String branch_id = Methods_myself.read(DIR_Branches,branch_name);
         //如果不存在这个branch，报错退出
-        if(branch == null)
+        if(branch_id == null)
         {
             System.out.println("A branch with that name does not exist.");
             System.exit(0);
         }
+        Commit branch = Methods_myself.find_commit(branch_id);
         //如果branch就是head，报错退出
-        if(branch.getTimestamp().equals(head_commit.getTimestamp()) && branch.getMessage().equals(head_commit.getMessage()))
+        if(Methods_myself.check_commit_equal(branch,head_commit))
         {
             System.out.println("Cannot merge a branch with itself.");
             System.exit(0);
         }
         //找到split node(共同的祖先)
         Commit ancestor = Methods_myself.find_common_ancestor(branch,head_commit);
-        if(ancestor.getTimestamp().equals(branch.getTimestamp()) && ancestor.getMessage().equals(branch.getMessage()))
+        if(Methods_myself.check_commit_equal(ancestor,branch))
         {
             System.out.println("Given branch is an ancestor of the current branch.");
             return;
         }
-        else if(ancestor.getMessage().equals(head_commit.getMessage()) && ancestor.getTimestamp().equals(head_commit.getTimestamp()))
+        if(Methods_myself.check_commit_equal(ancestor,head_commit))
         {
             System.out.println("Current branch fast-forwarded.");
             checkout3Task(branch_name);
             return;
         }
-        //
+
         HashMap<String,String> head_hash = head_commit.blob_name_content();
         HashMap<String,String> branch_hash = branch.blob_name_content();
         HashMap<String,String> ancestor_hash = ancestor.blob_name_content();
+        //情况2 3 4 7都是啥也不干
+        //情况1
         for(String name:ancestor_hash.keySet())
         {
-            //如果head中有这个文件
-            if(head_hash.containsKey(name))
+            if(head_hash.containsKey(name) && branch_hash.containsKey(name)
+            && head_hash.get(name).equals(ancestor_hash.get(name)) &&
+            !branch_hash.get(name).equals(ancestor_hash.get(name)))
             {
-                if(branch_hash.containsKey(name))
-                {
-                    //对应情况1
-                    if(ancestor_hash.get(name).equals(head_hash.get(name))
-                    && (!branch_hash.get(name).equals(ancestor_hash.get(name))))
-                    {
-                        //将head中原有的这个blobid删取，加上新的id
-                        String cont = branch_hash.get(name);
-                        String new_id = sha1(name,cont);
-                        int i = head_commit.find_Blob_name_return_i(name);
-                        head_commit.removeBlobid(i);
-                        head_commit.add_Blob(new_id);
-                    }
-                    //对应情况8
-                    if((!branch_hash.get(name).equals(ancestor_hash.get(name)))
-                    && (!head_hash.get(name).equals(ancestor_hash.get(name)))
-                    && (!head_hash.get(name).equals(branch_hash.get(name)))
-                    )
-                    {
-                        Methods_myself.merge_func_8(name,head_hash.get(name),branch_hash.get(name));
-                    }
-                }
-                else
-                {
-                    //对应情况6
-                    if(ancestor_hash.get(name).equals(head_hash.get(name)))
-                    {
-                        Methods_myself.remove_file(CWD,name);
-                        String id1 = sha1(name,head_hash.get(name));
-                        head_commit.remove_Blob(id1);
-                    }
-                    //对应情况8
-                    else
-                    {
-                        Methods_myself.merge_func_8(name,head_hash.get(name),"");
-                    }
-                }
+                //把内容更新到branch的内容
+                checkout2Task(branch_id,name);
+                addTask(name);
             }
-            if(branch_hash.containsKey(name))
+        }
+        //情况5
+        for(String name:branch_hash.keySet())
+        {
+            if(!head_hash.containsKey(name) && !ancestor_hash.containsKey(name))
             {
-                if(!head_hash.containsKey(name))
-                {
-                    //对应情况8
-                    if(!ancestor_hash.get(name).equals(branch_hash.get(name)))
-                    {
-                        Methods_myself.merge_func_8(name,"",branch_hash.get(name));
-                    }
-                }
+                checkout2Task(branch_id,name);
+                addTask(name);
+            }
+        }
+        //情况6
+        for(String name:ancestor_hash.keySet())
+        {
+            if(head_hash.containsKey(name) && !branch_hash.containsKey(name))
+            {
+                rmTask(name);
+            }
+        }
+        //情况8
+        for(String name:head_hash.keySet())
+        {
+            if(branch_hash.containsKey(name) && ancestor_hash.containsKey(name) &&
+                    !head_hash.get(name).equals(branch_hash.get(name)) &&
+                    !head_hash.get(name).equals(ancestor_hash.get(name)) &&
+                    !ancestor_hash.get(name).equals(branch_hash.get(name))
+            )
+            {
+                Methods_myself.merge_func_8(name,head_hash.get(name),branch_hash.get(name));
+                addTask(name);
+            }
+            else if(!branch_hash.containsKey(name) && ancestor_hash.containsKey(name)
+            && !ancestor_hash.get(name).equals(head_hash.get(name))
+            )
+            {
+                Methods_myself.merge_func_8(name,head_hash.get(name),"");
+                addTask(name);
+            }
+            else if(!ancestor_hash.containsKey(name)
+            && branch_hash.containsKey(name)
+            && !head_hash.get(name).equals(branch_hash.get(name))
+            )
+            {
+                Methods_myself.merge_func_8(name,head_hash.get(name),branch_hash.get(name));
+                addTask(name);
             }
         }
         for(String name:branch_hash.keySet())
         {
-            //对应情况5：
-            if((!ancestor_hash.containsKey(name)) && (!head_hash.containsKey(name)))
+            if(!head_hash.containsKey(name) &&
+            ancestor_hash.containsKey(name) &&
+            !branch_hash.get(name).equals(ancestor_hash.get(name)))
             {
-                //找到branch中与name对应的Blob
-                Blob b = branch.find_Blob_name(name);
-                Methods_myself.write_cont(CWD,name,b.getContent());
-
-                String id1 = sha1(name,branch_hash.get(name));
-                Methods_myself.write_cont(DIR_stage_addition,name,id1);
-            }
-            //对应情况8
-            if((!ancestor_hash.containsKey(name)) && head_hash.containsKey(name)
-                    && (!head_hash.get(name).equals(branch_hash.get(name)))
-            )
-            {
-                Methods_myself.merge_func_8(name,head_hash.get(name),branch_hash.get(name));
+                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                System.exit(0);
             }
         }
-        //情况2 3 4 7都是啥也不干
+        //构建新的commit
+        String message = "Merged "+branch_name+" into "+Methods_myself.read(GITLET_DIR,"cur_branch")+".";
+        commit_merge(message,branch_id);
     }
 }
