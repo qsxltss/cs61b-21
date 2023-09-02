@@ -169,13 +169,13 @@ public class Methods_myself {
         {
             String id = l11.get(i);
             if(l21.contains(id) || l22.contains(id))
-            {l11_id = id; l11_len = i+1;}
+            {l11_id = id; l11_len = i+1; break;}
         }
         for(int i=0; i<l12.size(); ++i)
         {
             String id = l11.get(i);
             if(l21.contains(id) || l22.contains(id))
-            {l12_id = id; l12_len = i+1;}
+            {l12_id = id; l12_len = i+1; break;}
         }
         if(l11_len <= l12_len && l11_len!=10000)
         {
