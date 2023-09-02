@@ -628,6 +628,12 @@ public class Repository implements Serializable {
         {
             if(!head_hash.containsKey(name) && !ancestor_hash.containsKey(name))
             {
+                //如果当前有这个名字的文件，则说明还没有被head跟踪，报错退出
+                if(Methods_myself.check_file_exist(CWD,name))
+                {
+                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                    System.exit(0);
+                }
                 checkout2Task(branch_id,name);
                 addTask(name);
             }
@@ -674,8 +680,14 @@ public class Repository implements Serializable {
             ancestor_hash.containsKey(name) &&
             !branch_hash.get(name).equals(ancestor_hash.get(name)))
             {
-                System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
-                System.exit(0);
+                //如果当前有这个名字的文件，则说明还没有被head跟踪，报错退出
+                if(Methods_myself.check_file_exist(CWD,name))
+                {
+                    System.out.println("There is an untracked file in the way; delete it, or add and commit it first.");
+                    System.exit(0);
+                }
+                Methods_myself.merge_func_8(name,"",branch_hash.get(name));
+                addTask(name);
             }
         }
         //构建新的commit
