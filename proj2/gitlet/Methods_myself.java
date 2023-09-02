@@ -129,26 +129,61 @@ public class Methods_myself {
     //找到两个commit的共同祖先
     public static Commit find_common_ancestor(Commit a,Commit b)
     {
-        List<String> l1 = new ArrayList<>();
-        List<String> l2 = new ArrayList<>();
+        List<String> l11 = new ArrayList<>();
+        List<String> l12 = new ArrayList<>();
+        List<String> l21 = new ArrayList<>();
+        List<String> l22 = new ArrayList<>();
         Commit c = a;
         while(c!=null)
         {
-            l1.add(c.getUID());
+            l11.add(c.getUID());
+            if(c.getParent() == null) c =null;
+            else c = Methods_myself.find_commit(c.getParent());
+        }
+        c = a;
+        while(c!=null)
+        {;
+            l12.add(c.getUID());
+            if(c.getParent2() == null) c =null;
+            else c = Methods_myself.find_commit(c.getParent2());
+        }
+        c = b;
+        while(c!=null)
+        {
+            l21.add(c.getUID());
             if(c.getParent() == null) c =null;
             else c = Methods_myself.find_commit(c.getParent());
         }
         c = b;
         while(c!=null)
         {
-            l2.add(c.getUID());
-            if(c.getParent() == null) c =null;
-            else c = Methods_myself.find_commit(c.getParent());
+            l22.add(c.getUID());
+            if(c.getParent2() == null) c =null;
+            else c = Methods_myself.find_commit(c.getParent2());
         }
-        for(int i=0; i<l1.size(); ++i)
+        String l11_id = null;
+        String l12_id = null;
+        int l11_len = 10000;
+        int l12_len = 10000;
+        for(int i=0; i<l11.size(); ++i)
         {
-            String id = l1.get(i);
-            if(l2.contains(id)) return Methods_myself.find_commit(id);
+            String id = l11.get(i);
+            if(l21.contains(id) || l22.contains(id))
+            {l11_id = id; l11_len = i+1;}
+        }
+        for(int i=0; i<l12.size(); ++i)
+        {
+            String id = l11.get(i);
+            if(l21.contains(id) || l22.contains(id))
+            {l12_id = id; l12_len = i+1;}
+        }
+        if(l11_len <= l12_len && l11_len!=10000)
+        {
+            return Methods_myself.find_commit(l11_id);
+        }
+        else if(l12_len < l11_len && l12_len!= 10000)
+        {
+            return Methods_myself.find_commit(l12_id);
         }
         return null;
     }
