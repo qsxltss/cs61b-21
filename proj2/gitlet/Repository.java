@@ -606,7 +606,10 @@ public class Repository implements Serializable {
             //对应情况5：
             if((!ancestor_hash.containsKey(name)) && (!head_hash.containsKey(name)))
             {
-                checkout1Task(name);
+                //找到branch中与name对应的Blob
+                Blob b = branch.find_Blob_name(name);
+                Methods_myself.write_cont(CWD,name,b.getContent());
+
                 String id1 = sha1(name,branch_hash.get(name));
                 Methods_myself.write_cont(DIR_stage_addition,name,id1);
             }
