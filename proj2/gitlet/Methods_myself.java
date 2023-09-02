@@ -2,10 +2,7 @@ package gitlet;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import static gitlet.Utils.readObject;
 import static gitlet.Utils.writeContents;
@@ -56,6 +53,16 @@ public class Methods_myself {
             throw new RuntimeException(e);
         }
         return f;
+    }
+    public static boolean remove_file(File dir, String name)
+    {
+        File f = Utils.join(dir,name);
+        if(f.exists())
+        {
+            f.delete();
+            return true;
+        }
+        else return false;
     }
     //找到head中存放的commit
     public static Commit head_commit()
@@ -118,5 +125,37 @@ public class Methods_myself {
             throw new RuntimeException(e);
         }
         writeContents(f,cont);
+    }
+    //找到两个commit的共同祖先
+    public static Commit find_common_ancestor(Commit a,Commit b)
+    {
+        List<String> l1 = new ArrayList<>();
+        List<String> l2 = new ArrayList<>();
+        Commit c = a;
+        while(c!=null)
+        {
+            l1.add(c.getUID());
+            if(c.getParent() == null) c =null;
+            else c = Methods_myself.find_commit(c.getParent());
+        }
+        c = b;
+        while(c!=null)
+        {
+            l2.add(c.getUID());
+            if(c.getParent() == null) c =null;
+            else c = Methods_myself.find_commit(c.getParent());
+        }
+        for(int i=0; i<l1.size(); ++i)
+        {
+            String id = l1.get(i);
+            if(l2.contains(id)) return Methods_myself.find_commit(id);
+        }
+        return null;
+    }
+    public static void merge_func_8(String name,String head,String branch)
+    {
+        System.out.println("Encountered a merge conflict.");
+        String str = "<<<<<<< HEAD\n"+head+"=======\n"+branch+">>>>>>>\n";
+        write_cont(Repository.CWD,name,str);
     }
 }

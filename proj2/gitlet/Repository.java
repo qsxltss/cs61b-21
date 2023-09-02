@@ -2,6 +2,8 @@ package gitlet;
 
 
 
+//import net.sf.saxon.expr.Component;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
@@ -506,6 +508,116 @@ public class Repository implements Serializable {
     }
     public void mergeTask(String branch_name)
     {
-
+        if(DIR_stage_addition.listFiles().length+DIR_stage_removal.listFiles().length >0)
+        {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+        Commit head_commit = Methods_myself.head_commit();
+        //找到branch_name对应的Commit
+        String id = readContentsAsString(Utils.join(DIR_Branches,branch_name));
+        Commit branch = Methods_myself.find_commit(id);
+        //如果不存在这个branch，报错退出
+        if(branch == null)
+        {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+        //如果branch就是head，报错退出
+        if(branch == head_commit)
+        {
+            System.out.println("You have uncommitted changes.");
+            System.exit(0);
+        }
+        //找到split node(共同的祖先)
+        Commit ancestor = Methods_myself.find_common_ancestor(branch,head_commit);
+        if(ancestor == branch)
+        {
+            System.out.println("Given branch is an ancestor of the current branch.");
+            return;
+        }
+        else if(ancestor == head_commit)
+        {
+            System.out.println("Current branch fast-forwarded.");
+            checkout3Task(branch_name);
+            return;
+        }
+        //
+        HashMap<String,String> head_hash = head_commit.blob_name_content();
+        HashMap<String,String> branch_hash = branch.blob_name_content();
+        HashMap<String,String> ancestor_hash = ancestor.blob_name_content();
+        for(String name:ancestor_hash.keySet())
+        {
+            //如果head中有这个文件
+            if(head_hash.containsKey(name))
+            {
+                if(branch_hash.containsKey(name))
+                {
+                    //对应情况1
+                    if(ancestor_hash.get(name).equals(head_hash.get(name))
+                    && (!branch_hash.get(name).equals(ancestor_hash.get(name))))
+                    {
+                        //将head中原有的这个blobid删取，加上新的id
+                        String cont = branch_hash.get(name);
+                        String new_id = sha1(name,cont);
+                        int i = head_commit.find_Blob_name_return_i(name);
+                        head_commit.removeBlobid(i);
+                        head_commit.add_Blob(new_id);
+                    }
+                    //对应情况8
+                    if((!branch_hash.get(name).equals(ancestor_hash.get(name)))
+                    && (!head_hash.get(name).equals(ancestor_hash.get(name)))
+                    && (!head_hash.get(name).equals(branch_hash.get(name)))
+                    )
+                    {
+                        Methods_myself.merge_func_8(name,head_hash.get(name),branch_hash.get(name));
+                    }
+                }
+                else
+                {
+                    //对应情况6
+                    if(ancestor_hash.get(name).equals(head_hash.get(name)))
+                    {
+                        Methods_myself.remove_file(CWD,name);
+                        String id1 = sha1(name,head_hash.get(name));
+                        head_commit.remove_Blob(id1);
+                    }
+                    //对应情况8
+                    else
+                    {
+                        Methods_myself.merge_func_8(name,head_hash.get(name),"");
+                    }
+                }
+            }
+            if(branch_hash.containsKey(name))
+            {
+                if(!head_hash.containsKey(name))
+                {
+                    //对应情况8
+                    if(!ancestor_hash.get(name).equals(branch_hash.get(name)))
+                    {
+                        Methods_myself.merge_func_8(name,"",branch_hash.get(name));
+                    }
+                }
+            }
+        }
+        for(String name:branch_hash.keySet())
+        {
+            //对应情况5：
+            if((!ancestor_hash.containsKey(name)) && (!head_hash.containsKey(name)))
+            {
+                checkout1Task(name);
+                String id1 = sha1(name,branch_hash.get(name));
+                Methods_myself.write_cont(DIR_stage_addition,name,id1);
+            }
+            //对应情况8
+            if((!ancestor_hash.containsKey(name)) && head_hash.containsKey(name)
+                    && (!head_hash.get(name).equals(branch_hash.get(name)))
+            )
+            {
+                Methods_myself.merge_func_8(name,head_hash.get(name),branch_hash.get(name));
+            }
+        }
+        //情况2 3 4 7都是啥也不干
     }
 }

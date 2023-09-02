@@ -172,5 +172,16 @@ public class Commit implements Serializable {
         Blob b = Utils.readObject(f, Blob.class);
         return b;
     }
+    //将commit中的Blob实现name<->content的hashmap
+    public HashMap<String,String> blob_name_content()
+    {
+        HashMap<String,String> hash = new HashMap<>();
+        for(int i=0; i<BlobIDs.size(); ++i)
+        {
+            Blob b = find_Blob(i);
+            hash.put(b.getName(),b.getContent());
+        }
+        return hash;
+    }
     /* TODO: fill in the rest of this class. */
 }
