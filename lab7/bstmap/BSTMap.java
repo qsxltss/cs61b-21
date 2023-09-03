@@ -143,7 +143,7 @@ public class BSTMap <K extends Comparable<K>,V>implements Map61B<K,V>
         else return this.right.remove(key);
     }
 
-    public K find_right1(BSTMap<K,V> b)
+    private K find_right1(BSTMap<K,V> b)
     {
         if(b.right.value == null)
         {
@@ -152,7 +152,7 @@ public class BSTMap <K extends Comparable<K>,V>implements Map61B<K,V>
         return find_right1(b.right);
     }
 
-    public V find_right2(BSTMap<K,V> b)
+    private V find_right2(BSTMap<K,V> b)
     {
         if(b.right.value == null)
         {
