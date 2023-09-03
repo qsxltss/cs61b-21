@@ -94,6 +94,7 @@ public class TestBSTMapExtra {
             rightChild.put((char) ('C'+i), 3+i);
         }
         rightChild.put('A', 100);
+        //System.out.println(rightChild.keySet().contains('D'));
         assertTrue(((Integer) rightChild.remove('D')).equals(new Integer(4)));
         assertTrue(((Integer) rightChild.remove('G')).equals(new Integer(7)));
         assertTrue(((Integer) rightChild.remove('A')).equals(new Integer(100)));
