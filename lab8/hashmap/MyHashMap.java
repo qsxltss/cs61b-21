@@ -206,11 +206,35 @@ public class MyHashMap<K, V> implements Map61B<K, V> {
 
     @Override
     public V remove(K key) {
+        if(!containsKey(key)) return null;
+        int id = abs(key.hashCode()%size);
+        Collection<Node> nodes = buckets[id];
+        V ans = null;
+        for(Node n:nodes)
+        {
+            if(n.key.equals(key))
+            {
+                ans = n.value;
+                nodes.remove(n);
+                return ans;
+            }
+        }
         return null;
     }
 
     @Override
     public V remove(K key, V value) {
+        if(!containsKey(key)) return null;
+        int id = abs(key.hashCode()%size);
+        Collection<Node> nodes = buckets[id];
+        for(Node n:nodes)
+        {
+            if(n.key.equals(key) && n.value.equals(value))
+            {
+                nodes.remove(n);
+                return value;
+            }
+        }
         return null;
     }
 
