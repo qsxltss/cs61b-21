@@ -3,7 +3,7 @@ package byow.Core;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
-import static java.lang.Math.max;
+import static java.lang.Math.*;
 
 public class Engine {
     TERenderer ter = new TERenderer();
@@ -50,9 +50,10 @@ public class Engine {
         if(input.charAt(0)== 'n')
         {
             int i = input.indexOf("s");
-            String str = input.substring(1,max(i,8));
+            String str = input.substring(1,min(i,8));
             long s = Long.parseLong(str);
             WorldGenerator w = new WorldGenerator(100,50,s);
+            System.out.println(s);
             w.GenerateWorld();
             return w.getWorld();
         }
