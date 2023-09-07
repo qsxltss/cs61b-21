@@ -7,7 +7,7 @@ public class Phase1Test {
     {
         TERenderer ter = new TERenderer();
         ter.initialize(80, 30);
-        WorldGenerator w = new WorldGenerator(80,30,100);
+        WorldGenerator w = new WorldGenerator(80,40,100);
         w.GenerateWorld();
         //w.GenerateHallways_fromRoom(w.getRoom_queue().poll(),w.getRoom_queue().poll());
         //w.GenerateRoom(w.new node(77,8),1,3);

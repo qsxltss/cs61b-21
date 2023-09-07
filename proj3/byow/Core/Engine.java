@@ -52,7 +52,7 @@ public class Engine {
             int i = input.indexOf("s");
             String str = input.substring(1,max(i,8));
             long s = Long.parseLong(str);
-            WorldGenerator w = new WorldGenerator(80,40,s);
+            WorldGenerator w = new WorldGenerator(100,50,s);
             w.GenerateWorld();
             return w.getWorld();
         }
