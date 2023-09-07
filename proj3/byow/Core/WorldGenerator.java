@@ -132,7 +132,7 @@ public class WorldGenerator {
         {
             if(OverlapRooms((room)nn[i],r))
             {
-                System.out.println("overlap!");
+                //System.out.println("overlap!");
                 return;
             }
         }
