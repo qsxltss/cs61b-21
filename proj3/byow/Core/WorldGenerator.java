@@ -253,6 +253,7 @@ public class WorldGenerator {
     {
         Object[] room_list = Room_queue.toArray();
         Random r = new Random(seed);
+        if(room_list.length == 0) return;
         int i = RandomUtils.uniform(r,0,room_list.length);
         node n1 = NodeInRoom((room)room_list[i]);
         //System.out.println(n1.x+" "+n1.y);
@@ -262,6 +263,7 @@ public class WorldGenerator {
     {
         Object[] room_list = Room_queue.toArray();
         Random r = new Random(seed+seed1);
+        if(room_list.length == 0) return;
         int i = RandomUtils.uniform(r,0,room_list.length);
         node n1 = NodeFromRoom((room)room_list[i]);
         if(world[n1.x+1][n1.y] == Tileset.WALL)
