@@ -292,7 +292,7 @@ public class WorldGenerator {
     {
         InitWorld();
         Random r = new Random(seed);
-        GenerateRoom_Randomly(RandomUtils.uniform(r,0,15));
+        GenerateRoom_Randomly(RandomUtils.uniform(r,1,15));
         GenerateHallways_AllRoom();
         GeneratePlayer();
         GenerateDoor(1);

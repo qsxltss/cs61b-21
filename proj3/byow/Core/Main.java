@@ -13,12 +13,12 @@ public class Main {
             System.out.println("Can only have two arguments - the flag and input string");
             System.exit(0);
         } else if (args.length == 2 && args[0].equals("-s")) {
-            //TERenderer ter = new TERenderer();
-            //ter.initialize(100, 50);
+            TERenderer ter = new TERenderer();
+            ter.initialize(100, 50);
             Engine engine = new Engine();
             System.out.println(engine.toString());
-            //TETile[][] ANS = engine.interactWithInputString(args[1]);
-            //ter.renderFrame(ANS);
+            TETile[][] ANS = engine.interactWithInputString(args[1]);
+            ter.renderFrame(ANS);
         // DO NOT CHANGE THESE LINES YET ;)
         } else if (args.length == 2 && args[0].equals("-p")) { System.out.println("Coming soon."); } 
         // DO NOT CHANGE THESE LINES YET ;)
