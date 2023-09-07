@@ -3,6 +3,8 @@ package byow.Core;
 import byow.TileEngine.TERenderer;
 import byow.TileEngine.TETile;
 
+import static java.lang.Math.max;
+
 public class Engine {
     TERenderer ter = new TERenderer();
     /* Feel free to change the width and height. */
@@ -48,8 +50,8 @@ public class Engine {
         if(input.charAt(0)== 'n')
         {
             int i = input.indexOf("s");
-            String str = input.substring(1,i);
-            long s = Integer.parseInt(str);
+            String str = input.substring(1,max(i,8));
+            long s = Long.parseLong(str);
             WorldGenerator w = new WorldGenerator(80,40,s);
             w.GenerateWorld();
             return w.getWorld();
