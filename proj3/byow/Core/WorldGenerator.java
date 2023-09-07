@@ -198,6 +198,7 @@ public class WorldGenerator {
     public void GenerateHallways_AllRoom()
     {
         Object[]Room_list = Room_queue.toArray();
+        if(Room_list.length == 0) return;
         room r = (room)Room_list[0];
         for(int i=1;i<Room_list.length;++i)
         {
