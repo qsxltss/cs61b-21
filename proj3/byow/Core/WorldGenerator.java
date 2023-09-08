@@ -13,6 +13,7 @@ public class WorldGenerator {
     private TETile[][] world;
     private Queue<room> Room_queue;
     private long seed;
+    private node per;
 
     public class node {
         private int x;
@@ -22,6 +23,8 @@ public class WorldGenerator {
             this.x = x;
             this.y = y;
         }
+        public int getX(){return x;}
+        public int getY(){return y;}
     }
 
     public class room implements Comparable<room> {
@@ -59,6 +62,8 @@ public class WorldGenerator {
     public TETile[][] getWorld() {
         return world;
     }
+    /** 返回当前人物位置 */
+    public node getPer(){return per;}
 
     public Queue<room> getRoom_queue()
     {
@@ -158,32 +163,59 @@ public class WorldGenerator {
         }
     }
 
-    //从一个房间的边缘上随机返回一个点
+    /** 从一个房间的外部边缘随机返回一个点 */
+    public node NodeFromRoomOutside(room r1)
+    {
+        Random r = new Random(seed);
+        node n1 = r1.a;
+        node n2 = r1.b;
+        int len1 = n2.x-n1.x+1;
+        int len2 = n2.y-n1.y+1;
+        int len = len1*2 + len2*2;
+        int i = RandomUtils.uniform(r,0,len);
+        if(i>=0 && i<len1)
+        {
+            return new node(n1.x+i,n1.y-1);
+        }
+        else if(i>=len1 && i<len1*2)
+        {
+            i -= len1;
+            return new node(n1.x+i,n2.y+1);
+        }
+        else if(i>=len1*2 && i<len1*2+len2)
+        {
+            i -= len1*2;
+            return new node(n1.x-1,n1.y+i);
+        }
+        else
+        {
+            i -= (len1*2+len2);
+            return new node(n2.x+1,n1.y+i);
+        }
+    }
+
+    //从一个房间的内部边缘随机返回一个点
     public node NodeFromRoom(room r1)
     {
         Random r = new Random(seed);
         int i = RandomUtils.uniform(r,0,r1.len());
         if(i>=0 && i<r1.h)
         {
-            //Draw_grid(new node(r1.a.x,i+r1.a.y),Tileset.FLOOR);
             return new node(r1.a.x,i+r1.a.y);
         }
         else if(i>=r1.h && i<r1.w+r1.h)
         {
             i -= r1.h;
-            //Draw_grid(new node(i+r1.a.x,r1.b.y),Tileset.FLOOR);
             return new node(i+r1.a.x,r1.b.y);
         }
         else if(i>=r1.h+r1.w && i<r1.w+2*r1.h)
         {
             i -= (r1.h+r1.w);
-            //Draw_grid(new node(r1.b.x,r1.b.y-i),Tileset.FLOOR);
             return new node(r1.b.x,r1.b.y-i);
         }
         else if(i>=2*r1.h+r1.w && i<2*r1.w+2*r1.h)
         {
             i -= (2*r1.h+r1.w);
-            //Draw_grid(new node(r1.b.x-i,r1.a.y),Tileset.FLOOR);
             return new node(r1.b.x-i,r1.a.y);
         }
         return null;
@@ -255,17 +287,37 @@ public class WorldGenerator {
         Random r = new Random(seed);
         if(room_list.length == 0) return;
         int i = RandomUtils.uniform(r,0,room_list.length);
+        System.out.println(i);
         node n1 = NodeInRoom((room)room_list[i]);
-        //System.out.println(n1.x+" "+n1.y);
+        per = n1;
         world[n1.x][n1.y] = Tileset.AVATAR;
     }
-    public void GenerateDoor(int seed1)
+    public void GenerateDoor()
     {
         Object[] room_list = Room_queue.toArray();
-        Random r = new Random(seed+seed1);
+        Random r = new Random(seed+3);
         if(room_list.length == 0) return;
-        int i = RandomUtils.uniform(r,0,room_list.length);
-        node n1 = NodeFromRoom((room)room_list[i]);
+        int i = RandomUtils.uniform(r,0, room_list.length);
+        room r1 = (room)room_list[i];
+        node n1 = NodeFromRoomOutside(r1);
+        if(world[n1.x][n1.y] == Tileset.FLOOR)
+        {
+            if(world[n1.x-2][n1.y] == Tileset.WALL)
+            {
+                world[n1.x-2][n1.y] = Tileset.LOCKED_DOOR;
+            }
+            else if(world[n1.x+2][n1.y] == Tileset.WALL)
+            {
+                world[n1.x+2][n1.y] = Tileset.LOCKED_DOOR;
+            }
+            else if(world[n1.x][n1.y-2] == Tileset.WALL)
+            {
+                world[n1.x][n1.y-2] = Tileset.LOCKED_DOOR;
+            }
+            else {world[n1.x][n1.y+2] = Tileset.LOCKED_DOOR; }
+        }
+        else world[n1.x][n1.y] = Tileset.LOCKED_DOOR;
+        /*node n1 = NodeFromRoom((room)room_list[i]);
         if(world[n1.x+1][n1.y] == Tileset.WALL)
         {
             world[n1.x+1][n1.y] = Tileset.LOCKED_DOOR;
@@ -286,7 +338,7 @@ public class WorldGenerator {
             world[n1.x][n1.y-1] = Tileset.LOCKED_DOOR;
             //Draw_grid(n1,Tileset.LOCKED_DOOR);
         }
-        else GenerateDoor(seed1+1);
+        else GenerateDoor(seed1+1);*/
     }
     public void GenerateWorld()
     {
@@ -295,6 +347,6 @@ public class WorldGenerator {
         GenerateRoom_Randomly(RandomUtils.uniform(r,1,15));
         GenerateHallways_AllRoom();
         GeneratePlayer();
-        GenerateDoor(1);
+        GenerateDoor();
     }
 }
