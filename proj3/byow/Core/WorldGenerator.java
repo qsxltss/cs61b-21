@@ -287,7 +287,6 @@ public class WorldGenerator {
         Random r = new Random(seed);
         if(room_list.length == 0) return;
         int i = RandomUtils.uniform(r,0,room_list.length);
-        System.out.println(i);
         node n1 = NodeInRoom((room)room_list[i]);
         per = n1;
         world[n1.x][n1.y] = Tileset.AVATAR;
@@ -295,22 +294,22 @@ public class WorldGenerator {
     public void GenerateDoor()
     {
         Object[] room_list = Room_queue.toArray();
-        Random r = new Random(seed+3);
+        Random r = new Random(seed);
         if(room_list.length == 0) return;
         int i = RandomUtils.uniform(r,0, room_list.length);
         room r1 = (room)room_list[i];
         node n1 = NodeFromRoomOutside(r1);
         if(world[n1.x][n1.y] == Tileset.FLOOR)
         {
-            if(world[n1.x-2][n1.y] == Tileset.WALL)
+            if(n1.x-2 >= 0 && world[n1.x-2][n1.y] == Tileset.WALL)
             {
                 world[n1.x-2][n1.y] = Tileset.LOCKED_DOOR;
             }
-            else if(world[n1.x+2][n1.y] == Tileset.WALL)
+            else if(n1.x+2 < width && world[n1.x+2][n1.y] == Tileset.WALL)
             {
                 world[n1.x+2][n1.y] = Tileset.LOCKED_DOOR;
             }
-            else if(world[n1.x][n1.y-2] == Tileset.WALL)
+            else if(n1.y-2 >= 0 && world[n1.x][n1.y-2] == Tileset.WALL)
             {
                 world[n1.x][n1.y-2] = Tileset.LOCKED_DOOR;
             }
