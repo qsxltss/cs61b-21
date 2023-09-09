@@ -14,16 +14,14 @@ public class WorldSaveRead {
     {
         System.out.println("111111");
         File f = join(CWD,"SaveWorld.dat");
-        f.setReadable(true);
-        f.setWritable(true);
-        f.setExecutable(true);
+        if(f.canRead())
+        {
+            System.out.println("12345");
+        }
         if(!f.exists())
         {
             try {
                 f.createNewFile();
-                f.setReadable(true);
-                f.setWritable(true);
-                f.setExecutable(true);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
