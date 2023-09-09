@@ -12,7 +12,6 @@ public class WorldSaveRead {
     public static final File CWD = new File(System.getProperty("user.dir"));
     public static void saveWorld(WorldGenerator w)
     {
-        System.out.println("111111");
         File f = join(CWD,"SaveWorld.dat");
         if(f.canRead())
         {
