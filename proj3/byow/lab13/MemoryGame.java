@@ -105,7 +105,7 @@ public class MemoryGame {
             pause(500);
         }
     }
-    /** */
+    /** 暂停一段时间 */
     public void pause(int milisecond)
     {
         try {

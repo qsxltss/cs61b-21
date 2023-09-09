@@ -3,19 +3,22 @@ package byow.Core;
 import byow.TileEngine.TETile;
 import byow.TileEngine.Tileset;
 
+import java.io.Serializable;
 import java.util.*;
 
 import static java.lang.Math.*;
 
-public class WorldGenerator {
+public class WorldGenerator implements Serializable {
     private int width;
     private int height;
     private TETile[][] world;
     private Queue<room> Room_queue;
     private long seed;
     private node per;
+    private node door;
+    private int FlowerNums;
 
-    public class node {
+    public class node implements Serializable{
         private int x;
         private int y;
 
@@ -27,7 +30,7 @@ public class WorldGenerator {
         public int getY(){return y;}
     }
 
-    public class room implements Comparable<room> {
+    public class room implements Comparable<room>,Serializable{
         private node a;
         private node b;
         private int w;
@@ -57,6 +60,7 @@ public class WorldGenerator {
         world = new TETile[w][h];
         Room_queue = new PriorityQueue<>();
         this.seed = seed;
+        this.FlowerNums = 3;
     }
 
     public TETile[][] getWorld() {
@@ -64,6 +68,16 @@ public class WorldGenerator {
     }
     /** 返回当前人物位置 */
     public node getPer(){return per;}
+    /** 返回目的地 */
+    public node getDoor(){return door;}
+    public void eatFlower()
+    {
+        this.FlowerNums -= 1;
+    }
+    public int CheckFlowers()
+    {
+        return this.FlowerNums;
+    }
 
     public Queue<room> getRoom_queue()
     {
@@ -291,61 +305,145 @@ public class WorldGenerator {
         per = n1;
         world[n1.x][n1.y] = Tileset.AVATAR;
     }
+
+    public void GenerateFlowers()
+    {
+        int k =0;
+        int time = 1;
+        while(k<3)
+        {
+            Object[] room_list = Room_queue.toArray();
+            Random r = new Random(seed+time);
+            if (room_list.length == 0) return;
+            int i = RandomUtils.uniform(r, 0, room_list.length);
+            node n1 = NodeInRoom((room)room_list[i]);
+            if(world[n1.x][n1.y].equals(Tileset.FLOOR))
+            {
+                world[n1.x][n1.y] = Tileset.FLOWER;
+                k++;
+            }
+            time++;
+        }
+    }
+
     public void GenerateDoor()
     {
         Object[] room_list = Room_queue.toArray();
-        Random r = new Random(seed);
+        Random r = new Random(seed+3);
         if(room_list.length == 0) return;
         int i = RandomUtils.uniform(r,0, room_list.length);
         room r1 = (room)room_list[i];
         node n1 = NodeFromRoomOutside(r1);
         if(world[n1.x][n1.y] == Tileset.FLOOR)
         {
-            if(n1.x-2 >= 0 && world[n1.x-2][n1.y] == Tileset.WALL)
+            if(n1.x-2 >= 0 && world[n1.x-2][n1.y].equals(Tileset.WALL))
             {
-                world[n1.x-2][n1.y] = Tileset.LOCKED_DOOR;
+                world[n1.x-2][n1.y] = Tileset.UNLOCKED_DOOR;
+                door = new node(n1.x-2,n1.y);
             }
-            else if(n1.x+2 < width && world[n1.x+2][n1.y] == Tileset.WALL)
+            else if(n1.x+2 < width && world[n1.x+2][n1.y].equals(Tileset.WALL))
             {
-                world[n1.x+2][n1.y] = Tileset.LOCKED_DOOR;
+                world[n1.x+2][n1.y] = Tileset.UNLOCKED_DOOR;
+                door = new node(n1.x+2,n1.y);
             }
-            else if(n1.y-2 >= 0 && world[n1.x][n1.y-2] == Tileset.WALL)
+            else if(n1.y-2 >= 0 && world[n1.x][n1.y-2].equals(Tileset.WALL) )
             {
-                world[n1.x][n1.y-2] = Tileset.LOCKED_DOOR;
+                world[n1.x][n1.y-2] = Tileset.UNLOCKED_DOOR;
+                door = new node(n1.x,n1.y-2);
             }
-            else {world[n1.x][n1.y+2] = Tileset.LOCKED_DOOR; }
+            else
+            {
+                world[n1.x][n1.y+2] = Tileset.UNLOCKED_DOOR;
+                door = new node(n1.x,n1.y+2);
+            }
         }
-        else world[n1.x][n1.y] = Tileset.LOCKED_DOOR;
-        /*node n1 = NodeFromRoom((room)room_list[i]);
-        if(world[n1.x+1][n1.y] == Tileset.WALL)
+        else
         {
-            world[n1.x+1][n1.y] = Tileset.LOCKED_DOOR;
-            //Draw_grid(n1,Tileset.LOCKED_DOOR);
+            world[n1.x][n1.y] = Tileset.UNLOCKED_DOOR;
+            door = new node(n1.x,n1.y);
         }
-        else if(world[n1.x-1][n1.y] == Tileset.WALL)
-        {
-            world[n1.x-1][n1.y] = Tileset.LOCKED_DOOR;
-            //Draw_grid(n1,Tileset.LOCKED_DOOR);
-        }
-        else if(world[n1.x][n1.y+1] == Tileset.WALL)
-        {
-            world[n1.x][n1.y+1] = Tileset.LOCKED_DOOR;
-            //Draw_grid(n1,Tileset.LOCKED_DOOR);
-        }
-        else if(world[n1.x][n1.y-1] == Tileset.WALL)
-        {
-            world[n1.x][n1.y-1] = Tileset.LOCKED_DOOR;
-            //Draw_grid(n1,Tileset.LOCKED_DOOR);
-        }
-        else GenerateDoor(seed1+1);*/
     }
     public void GenerateWorld()
     {
         InitWorld();
         Random r = new Random(seed);
-        GenerateRoom_Randomly(RandomUtils.uniform(r,1,15));
+        GenerateRoom_Randomly(RandomUtils.uniform(r,15,20));
         GenerateHallways_AllRoom();
         GeneratePlayer();
+        GenerateFlowers();
         GenerateDoor();
+    }
+
+    /** 移动人物 */
+    public node MovePer(char c)
+    {
+        node p = per;
+        if(c == 'A' || c=='a')
+        {
+            if(world[per.x-1][per.y] == Tileset.WALL)
+            {
+                System.out.println("Movement is Forbidden!");
+                return null;
+            }
+            if(world[per.x-1][per.y] == Tileset.FLOWER)
+            {
+                eatFlower();
+            }
+            world[per.x][per.y] = Tileset.FLOOR;
+            per = new node(per.x-1, per.y);
+            world[per.x][per.y] = Tileset.AVATAR;
+        }
+        else if(c == 'W' || c == 'w')
+        {
+            if(world[per.x][per.y+1] == Tileset.WALL)
+            {
+                System.out.println("Movement is Forbidden!");
+                return null;
+            }
+            if(world[per.x][per.y+1] == Tileset.FLOWER)
+            {
+                eatFlower();
+            }
+            world[per.x][per.y] = Tileset.FLOOR;
+            per = new node(per.x, per.y+1);
+            world[per.x][per.y] = Tileset.AVATAR;
+        }
+        else if(c == 'D' || c== 'd')
+        {
+            if(world[per.x+1][per.y] == Tileset.WALL)
+            {
+                System.out.println("Movement is Forbidden!");
+                return null;
+            }
+            if(world[per.x+1][per.y] == Tileset.FLOWER)
+            {
+                eatFlower();
+            }
+            world[per.x][per.y] = Tileset.FLOOR;
+            per = new node(per.x+1, per.y);
+            world[per.x][per.y] = Tileset.AVATAR;
+        }
+        else if(c == 'S' || c == 's')
+        {
+            if(world[per.x][per.y-1] == Tileset.WALL)
+            {
+                System.out.println("Movement is Forbidden!");
+                return null;
+            }
+            if(world[per.x][per.y-1] == Tileset.FLOWER)
+            {
+                eatFlower();
+            }
+
+            world[per.x][per.y] = Tileset.FLOOR;
+            per = new node(per.x, per.y-1);
+            world[per.x][per.y] = Tileset.AVATAR;
+        }
+        else
+        {
+            System.out.println("Wrong Input!");
+            return null;
+        }
+        return per;
     }
 }

@@ -49,12 +49,52 @@ public class Engine {
         // that works for many different input types.
         if(input.charAt(0)== 'n')
         {
+            //生成随机世界
             int i = input.indexOf("s");
             String str = input.substring(1,min(i,8));
             long s = Long.parseLong(str);
-            WorldGenerator w = new WorldGenerator(100,50,s);
-            System.out.println(s);
+            WorldGenerator w = new WorldGenerator(80,40,s);
+            //System.out.println(s);
             w.GenerateWorld();
+            //把s给读掉
+            System.out.println(w.getPer().getX()+" "+w.getPer().getY());
+            i++;
+            while(i<input.length())
+            {
+                char c = input.charAt(i);
+                if(c == 'w' || c=='a' || c=='s' || c=='d')
+                {
+                    w.MovePer(c);
+                }
+                else if(c == ':')
+                {
+                    WorldSaveRead.saveWorld(w,"SaveWorld.dat");
+                    break;
+                }
+                i++;
+            }
+            System.out.println(w.getPer().getX()+" "+w.getPer().getY());
+            return w.getWorld();
+        }
+        else if(input.charAt(0)== 'l')
+        {
+            String filename = "SaveWorld.dat";
+            WorldGenerator w = WorldSaveRead.readWorld(filename);
+            int i = 1;
+            while(i<input.length())
+            {
+                char c = input.charAt(i);
+                if(c == 'w' || c=='a' || c=='s' || c=='d')
+                {
+                    w.MovePer(c);
+                }
+                else if(c == ':')
+                {
+                    WorldSaveRead.saveWorld(w,"SaveWorld.dat");
+                    break;
+                }
+                i++;
+            }
             return w.getWorld();
         }
         TETile[][] finalWorldFrame = null;

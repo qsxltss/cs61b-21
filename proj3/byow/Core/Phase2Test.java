@@ -27,10 +27,10 @@ public class Phase2Test
     }
     public void test()
     {
-        WorldGenerator w = new WorldGenerator(60,20, seed);
+        //WorldGenerator w = new WorldGenerator(60,20, seed);
         Game game = new Game();
-        game.initialize(70, 40);
-        w.GenerateWorld();
-        game.renderFrame(w.getWorld(),w.getPer());
+        game.initialize(90, 60);
+        //w.GenerateWorld();
+        //game.renderFrame(w.getWorld(),w.getPer());
     }
 }
