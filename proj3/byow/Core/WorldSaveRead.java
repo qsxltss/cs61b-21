@@ -13,10 +13,9 @@ public class WorldSaveRead {
     public static void saveWorld(WorldGenerator w)
     {
         File f = join(CWD,"SaveWorld.dat");
-        if(f.canRead())
-        {
-            System.out.println("12345q");
-        }
+        f.setWritable(true);
+        f.setReadable(true);
+        f.setExecutable(true);
         if(!f.exists())
         {
             try {
