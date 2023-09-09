@@ -12,12 +12,12 @@ public class WorldSaveRead {
     public static final File CWD = new File(System.getProperty("user.dir"));
     public static void saveWorld(WorldGenerator w)
     {
-        //CWD.setWritable(true);
-        //CWD.setReadable(true);
-        //CWD.setExecutable(true);
+        CWD.setWritable(true);
+        CWD.setReadable(true);
+        CWD.setExecutable(true);
         File f = join(CWD,"SaveWorld.dat");
-        //if(!f.exists())
-        //{
+        if(!f.exists())
+        {
             try {
                 f.createNewFile();
                 f.setWritable(true);
@@ -26,7 +26,7 @@ public class WorldSaveRead {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-        //}
+        }
         writeObject(f,w);
         /* 这也是可以的
         try {
