@@ -16,7 +16,7 @@ public class WorldSaveRead {
         File f = join(CWD,"SaveWorld.dat");
         if(f.canRead())
         {
-            System.out.println("12345");
+            System.out.println("12345q");
         }
         if(!f.exists())
         {
