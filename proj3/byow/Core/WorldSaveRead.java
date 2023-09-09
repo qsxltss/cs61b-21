@@ -12,14 +12,17 @@ public class WorldSaveRead {
     public static final File CWD = new File(System.getProperty("user.dir"));
     public static void saveWorld(WorldGenerator w)
     {
+        CWD.setWritable(true);
+        CWD.setReadable(true);
+        CWD.setExecutable(true);
         File f = join(CWD,"SaveWorld.dat");
-        f.setWritable(true);
-        f.setReadable(true);
-        f.setExecutable(true);
         if(!f.exists())
         {
             try {
                 f.createNewFile();
+                f.setWritable(true);
+                f.setExecutable(true);
+                f.setReadable(true);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -28,7 +31,7 @@ public class WorldSaveRead {
         /* 这也是可以的
         try {
             // 创建文件输出流
-            FileOutputStream fos = new FileOutputStream(filename);
+            FileOutputStream fos = new FileOutputStream("SaveWorld.dat");
 
             // 创建对象输出流
             ObjectOutputStream oos = new ObjectOutputStream(fos);
@@ -40,11 +43,11 @@ public class WorldSaveRead {
             oos.close();
             fos.close();
 
-            System.out.println("数组已序列化并写入文件 " + filename);
+            System.out.println("数组已序列化并写入文件 " + "SaveWorld.dat");
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
-        */
+        }*/
+
     }
 
     public static WorldGenerator readWorld(String filename)
@@ -59,7 +62,6 @@ public class WorldSaveRead {
         /*try {
             // 创建文件输入流
             FileInputStream fis = new FileInputStream(filename);
-
             // 创建对象输入流
             ObjectInputStream ois = new ObjectInputStream(fis);
 
