@@ -68,12 +68,12 @@ public class Engine {
                 }
                 else if(c == ':')
                 {
-                    WorldSaveRead.saveWorld(w,"SaveWorld.dat");
+                    WorldSaveRead.saveWorld(w);
                     break;
                 }
                 i++;
             }
-            System.out.println(w.getPer().getX()+" "+w.getPer().getY());
+            //System.out.println(w.getPer().getX()+" "+w.getPer().getY());
             return w.getWorld();
         }
         else if(input.charAt(0)== 'l')
@@ -90,7 +90,7 @@ public class Engine {
                 }
                 else if(c == ':')
                 {
-                    WorldSaveRead.saveWorld(w,"SaveWorld.dat");
+                    WorldSaveRead.saveWorld(w);
                     break;
                 }
                 i++;

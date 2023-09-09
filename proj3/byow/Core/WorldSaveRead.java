@@ -1,13 +1,28 @@
 package byow.Core;
 
+import org.antlr.v4.runtime.misc.Utils;
+
 import java.io.*;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 
+import static byow.Core.MyUtils.*;
+
 public class WorldSaveRead {
-    public static void saveWorld(WorldGenerator w,String filename)
+    public static final File CWD = new File(System.getProperty("user.dir"));
+    public static void saveWorld(WorldGenerator w)
     {
-        try {
+        File f = join(CWD,"SaveWorld.dat");
+        if(!f.exists())
+        {
+            try {
+                f.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        writeContents(f,w);
+        /*try {
             // 创建文件输出流
             FileOutputStream fos = new FileOutputStream(filename);
 
@@ -24,12 +39,19 @@ public class WorldSaveRead {
             System.out.println("数组已序列化并写入文件 " + filename);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }
+        }*/
     }
 
     public static WorldGenerator readWorld(String filename)
     {
-        try {
+        File f = join(CWD,filename);
+        if(!f.exists())
+        {
+            return null;
+        }
+        WorldGenerator w = readObject(f, WorldGenerator.class);
+        return w;
+        /*try {
             // 创建文件输入流
             FileInputStream fis = new FileInputStream(filename);
 
@@ -46,6 +68,6 @@ public class WorldSaveRead {
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        return null;
+        return null;*/
     }
 }

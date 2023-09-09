@@ -382,7 +382,7 @@ public class WorldGenerator implements Serializable {
         {
             if(world[per.x-1][per.y] == Tileset.WALL)
             {
-                System.out.println("Movement is Forbidden!");
+                //System.out.println("Movement is Forbidden!");
                 return null;
             }
             if(world[per.x-1][per.y] == Tileset.FLOWER)
@@ -397,7 +397,7 @@ public class WorldGenerator implements Serializable {
         {
             if(world[per.x][per.y+1] == Tileset.WALL)
             {
-                System.out.println("Movement is Forbidden!");
+                //System.out.println("Movement is Forbidden!");
                 return null;
             }
             if(world[per.x][per.y+1] == Tileset.FLOWER)
@@ -412,7 +412,7 @@ public class WorldGenerator implements Serializable {
         {
             if(world[per.x+1][per.y] == Tileset.WALL)
             {
-                System.out.println("Movement is Forbidden!");
+                //System.out.println("Movement is Forbidden!");
                 return null;
             }
             if(world[per.x+1][per.y] == Tileset.FLOWER)
@@ -427,7 +427,7 @@ public class WorldGenerator implements Serializable {
         {
             if(world[per.x][per.y-1] == Tileset.WALL)
             {
-                System.out.println("Movement is Forbidden!");
+                //System.out.println("Movement is Forbidden!");
                 return null;
             }
             if(world[per.x][per.y-1] == Tileset.FLOWER)
