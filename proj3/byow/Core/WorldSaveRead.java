@@ -22,7 +22,7 @@ public class WorldSaveRead {
                 throw new RuntimeException(e);
             }
         }
-        writeContents(f,w);
+        writeObject(f,w);
         /* 这也是可以的
         try {
             // 创建文件输出流
