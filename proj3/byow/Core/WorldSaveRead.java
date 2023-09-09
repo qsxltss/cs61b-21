@@ -13,19 +13,21 @@ public class WorldSaveRead {
     public static void saveWorld(WorldGenerator w)
     {
         File f = join(CWD,"SaveWorld.dat");
+        if(f.canRead())
+        {
+            System.out.println("12345q");
+        }
         if(!f.exists())
         {
             try {
                 f.createNewFile();
-                f.setExecutable(true);
-                f.setReadable(true);
-                f.setWritable(true);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         }
-        writeContents(f,w);
-        /*try {
+        writeObject(f,w);
+        /* 这也是可以的
+        try {
             // 创建文件输出流
             FileOutputStream fos = new FileOutputStream(filename);
 
@@ -42,7 +44,8 @@ public class WorldSaveRead {
             System.out.println("数组已序列化并写入文件 " + filename);
         } catch (IOException e) {
             throw new RuntimeException(e);
-        }*/
+        }
+        */
     }
 
     public static WorldGenerator readWorld(String filename)
