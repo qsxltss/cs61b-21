@@ -17,6 +17,9 @@ public class WorldSaveRead {
         {
             try {
                 f.createNewFile();
+                f.setExecutable(true);
+                f.setReadable(true);
+                f.setWritable(true);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
